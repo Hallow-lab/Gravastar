@@ -1,0 +1,172 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Cave Tracker</title>
+<style>
+:root{--bg:#f6f7f9;--fg:#1a1d23;--card:#fff;--mut:#667085;--bd:#dfe3ea;--g:#22a559;--y:#e9a91b;--r:#d9433b;--ac:#d84e55;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12141a;--fg:#eceef3;--card:#1c1f28;--mut:#98a2b3;--bd:#2c313d;--ac:#ff7b82}}
+:root[data-theme="dark"]{--bg:#12141a;--fg:#eceef3;--card:#1c1f28;--mut:#98a2b3;--bd:#2c313d;--ac:#7c93ff}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--fg);font:15px/1.4 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+main{max-width:980px;margin:auto;padding:14px}h1{font-size:22px;margin:4px 0 2px}p.s{color:var(--mut);margin:0 0 12px}
+.card{background:var(--card);border:1px solid var(--bd);border-radius:12px;padding:12px;margin-bottom:12px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+input,select,button{font:inherit;padding:8px 10px;border-radius:8px;border:1px solid var(--bd);background:var(--card);color:var(--fg)}
+button{cursor:pointer}button.p{background:var(--ac);color:#fff;border-color:var(--ac)}button.on{background:var(--ac);color:#fff}
+#q{flex:1;min-width:200px}
+.fl h3{margin:0 0 8px;font-size:14px;color:var(--mut)}.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.t{border-radius:10px;padding:8px;color:#fff;cursor:pointer;min-height:64px;border:2px solid transparent}.t b{display:block}.t small{opacity:.95}
+.g{background:var(--g)}.y{background:var(--y);color:#241a00}.r{background:var(--r)}.sel{border-color:var(--fg)}
+#scene{perspective:1600px;height:860px;overflow:hidden;position:relative;background:linear-gradient(#a9cdee,#e4f0fb 45%,#86b874 45%);border-radius:10px;touch-action:pan-y;cursor:grab}
+#cap{position:absolute;left:10px;top:8px;font-size:12px;color:#1f3a5f;z-index:2;background:#fffc;padding:3px 8px;border-radius:6px}
+#bld{position:absolute;left:50%;top:92%;width:480px;height:180px;margin-left:-240px;margin-top:-90px;transform-style:preserve-3d;transform:translateY(var(--ty,0px)) scale(calc(var(--s,1)*var(--z,1))) rotateX(var(--rx,62deg)) rotateZ(var(--rz,-25deg))}
+#bld div,#bld span{position:absolute}
+.gd{left:-170px;top:-130px;width:780px;height:570px;background:#7fb069;transform:translateZ(-6px)}
+.ap{left:-24px;top:-20px;width:528px;height:226px;background:#d9cfba;border-radius:6px;transform:translateZ(-5px)}
+.rd{left:-170px;top:262px;width:780px;height:72px;background:linear-gradient(90deg,#fff 50%,transparent 50%) 0 34px/40px 4px repeat-x,#4b5058;transform:translateZ(-5px)}
+.pa{left:200px;top:196px;width:44px;height:66px;background:#d9cfba;transform:translateZ(-5px)}
+.sg{left:10px;top:216px;width:180px;height:26px;transform-origin:bottom;transform:rotateX(-90deg);background:#1d3f8f;color:#fff;font:600 10px/1.1 system-ui;display:flex;align-items:center;justify-content:center;text-align:center;border:3px solid #fff}
+.tree{width:0;height:0;transform-style:preserve-3d}
+.tp{left:-30px;top:-84px;width:60px;height:84px;transform-origin:bottom;transform:rotateX(-90deg);background:radial-gradient(circle 26px at 50% 30px,#2e8b3d 0 23px,#5bbd68 24px 26px,transparent 27px),linear-gradient(#6b4423,#6b4423) 50% 100%/7px 36px no-repeat}
+.tp.b{transform:rotateZ(90deg) rotateX(-90deg)}.sh{left:-20px;top:-9px;width:40px;height:18px;background:#0003;border-radius:50%;transform:translateZ(-4px)}
+.slab.op .fa{border-color:#d84e55;box-shadow:0 0 18px #d84e55;background:rgba(220,228,255,.85)}
+.slab{inset:0;transform-style:preserve-3d}
+.fa{inset:0;background:rgba(206,211,219,.65);border:2px solid #7d8696;transform:translateZ(0)}
+.co{left:0;right:48px;top:74px;height:32px;background:rgba(255,255,255,.5);transform:translateZ(1px)}
+.st{right:4px;top:8px;width:40px;height:164px;background:#8f99aa;color:#fff;font-size:11px;display:flex;align-items:center;justify-content:center;writing-mode:vertical-rl;transform:translateZ(1px)}
+.bw{left:0;top:-60px;width:480px;height:60px;transform-origin:bottom;transform:rotateX(-90deg);background:repeating-linear-gradient(90deg,transparent 0 76px,#fffb 76px 82px),linear-gradient(#7fb4e6,#2f6aa8);opacity:.6}
+.sw{left:0;top:0;width:60px;height:180px;transform-origin:left;transform:rotateY(-90deg);background:repeating-linear-gradient(0deg,transparent 0 76px,#fffb 76px 82px),linear-gradient(90deg,#7fb4e6,#2f6aa8);opacity:.5}
+.lb{left:-32px;top:82px;font-size:13px;font-weight:700;color:#fff;background:#3b4252;border-radius:50%;width:22px;height:22px;text-align:center;line-height:22px;transform:translateZ(1px)}
+.rs{left:250px;top:64px;width:150px;height:44px;background:#b3261e;color:#fff;font-weight:800;font-size:22px;display:flex;align-items:center;justify-content:center;transform:translateZ(3px);border:3px solid #fff}
+.tk{width:46px;height:46px;border-radius:50%;background:radial-gradient(#f1f4f8 34%,#8fa0b5 36%);transform:translateZ(2px)}
+.rm{width:120px;height:66px;transform-style:preserve-3d;cursor:pointer}
+.rm div,.rm i,.rm u{position:absolute}
+.fo{inset:0;background:repeating-linear-gradient(0deg,#0000 0 11px,#0002 11px 12px),repeating-linear-gradient(90deg,#0000 0 11px,#0002 11px 12px),var(--c);transform:translateZ(1px);border:1px solid #0006}
+.lbl{left:6px;top:5px;width:108px;transform:translateZ(13px);background:#0f172ad0;border:2px solid var(--c);color:#fff;padding:2px 3px;border-radius:8px;text-align:center;font-size:10px;line-height:1.15}.lbl b{display:block;font-size:22px;font-weight:800;letter-spacing:.5px}.lbl em{display:block;font-style:normal;font-size:8px;opacity:.85}
+.cl{width:56px;height:22px;background:#fff;color:#111;font:800 11px/18px system-ui;text-align:center;border-radius:4px;border:2px solid var(--c);transform:translateZ(2px);overflow:hidden}
+.rm i{width:46px;height:9px;transform-style:preserve-3d}
+.rm i::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent 18%,#fffb 18% 26%,transparent 26% 58%,#fffb 58% 66%,transparent 66%),#b98246;border:1px solid #6b4423;transform:translateZ(9px)}
+.occ i::before{background:radial-gradient(circle,#173a6b 0 2.6px,transparent 3.2px) 0 0/15.3px 9px,#b98246}
+.rm i::after{content:"";position:absolute;left:0;top:0;width:100%;height:9px;background:#7a4f24;transform-origin:bottom;transform:rotateX(-90deg)}
+.rm i b{position:absolute;left:0;top:-9px;width:100%;height:9px;background:#6a4320;transform-origin:bottom;transform:rotateX(-90deg)}
+.wb,.wf{left:0;width:120px;height:52px;transform-origin:bottom;transform:rotateX(-90deg);background:color-mix(in srgb,var(--c) 38%,transparent);border:1px solid var(--c)}
+.wb{top:-52px}.wf{top:14px}
+.wd::after{content:"";position:absolute;left:50px;bottom:0;width:20px;height:38px;background:#6b4423;border:1px solid #3d2410}
+.wk::after{content:"";position:absolute;left:8px;top:14px;width:50px;height:22px;background:#1f4d3a;border:2px solid #ddd;box-shadow:0 3px 0 #b9a27c}
+.ac .wk::before{content:"";position:absolute;left:92px;top:2px;width:24px;height:6px;background:#fff;border-radius:2px}
+.nac .wk::before{content:"";position:absolute;left:100px;top:2px;width:12px;height:12px;border-radius:50%;background:radial-gradient(#444 30%,#ddd 32%)}
+.wl,.wr{top:0;width:52px;height:66px;transform-origin:left;transform:rotateY(-90deg);background:color-mix(in srgb,var(--c) 34%,transparent);border:1px solid var(--c)}.wl{left:0}.wr{left:120px}
+.wi{background:linear-gradient(135deg,#eaf6ff,#8fc3ee 60%,#cfe8ff);border:2px solid #fff;box-shadow:0 3px 0 #cfd6de,inset 0 0 0 1px #5a7ea3}
+.wi::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:#fff}.wi::after{content:"";position:absolute;top:50%;left:0;right:0;height:2px;margin-top:-1px;background:#fff}
+.sd{left:10px;top:12px;width:34px;height:42px}
+.rm.sel .fo{outline:3px solid #fff;box-shadow:0 0 16px #fff}
+#det{position:sticky;bottom:8px;border-color:var(--ac)}#cd{font-size:28px;font-weight:700;font-variant-numeric:tabular-nums}
+.res{padding:8px 0;border-top:1px solid var(--bd);cursor:pointer}.leg span{margin-right:12px}.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:4px}
+a.wa{display:inline-block;background:#25d366;color:#04310f;font-weight:600;text-decoration:none;padding:9px 14px;border-radius:8px}
+body{background:var(--bg)}
+.hd{background:linear-gradient(135deg,#d84e55,#a92a33);color:#fff;padding:16px 16px 56px}.hd .lg{font-size:22px;max-width:980px;margin:0 auto}.hd small{display:block;max-width:980px;margin:2px auto 0;opacity:.9}
+main{margin-top:-40px}.sc{box-shadow:0 6px 18px #0002}.ttl{font-weight:700;font-size:16px;margin-bottom:8px}.sc #q{width:100%;padding:12px;font-size:15px}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0}.chip,#fb button{border-radius:20px;padding:5px 12px;font-size:13px}#fb button.on{background:var(--ac);color:#fff;border-color:var(--ac)}
+button.big{width:100%;padding:13px;font-weight:700;letter-spacing:.5px;font-size:15px;border-radius:10px}
+.tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:4px}.tabs button{flex:1;border:0;border-bottom:3px solid transparent;border-radius:0;background:none;font-weight:600;color:var(--mut)}.tabs button.on{color:var(--ac);border-bottom-color:var(--ac);background:none}
+.tiles{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))!important}
+.bc{display:flex;align-items:center;gap:10px;background:var(--card);border:1px solid var(--bd);border-left:5px solid var(--g);border-radius:10px;padding:10px 12px;cursor:pointer;margin-top:6px}.s-y{border-left-color:var(--y)}.s-r{border-left-color:var(--r)}
+.bc .l{flex:1}.bc .l b{display:block;font-size:17px}.bc .l small{display:block;color:var(--mut);font-size:12px}.bc .l em{font-style:normal;font-size:10px;background:var(--ac);color:#fff;padding:1px 7px;border-radius:4px}
+.bc .m{text-align:center}.bc .m b{display:block;font-size:11px;font-weight:500;color:var(--mut)}.bc .m span{font-size:17px;font-weight:700}
+.bc .r{text-align:right}.bc .st{display:inline-block;background:var(--g);color:#fff;padding:2px 8px;border-radius:6px;font-size:11px}.s-y .st{background:var(--y);color:#241a00}.s-r .st{background:var(--r)}.bc .r small{display:block;color:var(--mut);font-size:11px}.bc .go{display:block;color:var(--ac);font-weight:700;font-size:12px}.bc.sel{outline:2px solid var(--ac)}
+.hd .lg{display:flex;align-items:center;gap:10px}.bat{width:58px;height:34px;border-radius:50%;background:#f5d000;border:2px solid #111;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 2px 6px #0005}.bat svg{width:42px;fill:#111}</style></head><body><header class="hd"><div class="lg"><span class="bat"><svg viewBox="0 0 100 50" aria-hidden="true"><path d="M50 12L54 6L56 16Q64 12 72 15Q88 10 98 24Q88 20 82 28Q76 24 70 31Q63 26 58 35L50 46L42 35Q37 26 30 31Q24 24 18 28Q12 20 2 24Q12 10 28 15Q36 12 44 16L46 6Z"/></svg></span> <b>Cave</b> Tracker</div><small>Find your hideout · free rooms at SRM KTR · Mon–Fri, periods 1–9</small></header>
+<main>
+<div class="card sc"><div class="ttl">Where do you want to study?</div><input id="q" placeholder="e.g. AC room on the ground floor for my team for the next 2 hours"><div class="chips"><button class="chip" data-t="AC room">❄️ AC</button><button class="chip" data-t="non-AC room">Non-AC</button><button class="chip" data-t="ground floor">Ground floor</button><button class="chip" data-t="on 3rd floor">3rd floor</button><button class="chip" data-t="for 1 hour">1 hour</button><button class="chip" data-t="for 2 hours">2 hours</button></div><button class="p big" id="go">SEARCH ROOMS</button><div id="out"></div></div>
+<div class="card row"><select id="day"></select><input type="time" id="tm"><button id="now">Now (live)</button><span id="clk" style="color:var(--mut)"></span></div>
+<div class="tabs"><button id="v1" class="on">Floor grid</button><button id="v2">3D map</button></div><div class="leg" style="margin:8px 0 10px"><span><i class="dot g"></i>Free ≥1h</span><span><i class="dot y"></i>Free &lt;1h</span><span><i class="dot r"></i>Occupied</span></div>
+<div id="grid"></div>
+<div id="map" hidden><div class="row" id="fb" style="margin-bottom:6px"></div><div class="s" id="fi" style="margin:0 0 8px"></div><div class="card"><div class="row">Rotate <input type="range" id="rot" min="-180" max="180" value="-25" style="flex:1"> Tilt <input type="range" id="til" min="35" max="75" value="62" style="flex:1"> Zoom <input type="range" id="zm" min="60" max="300" value="100" style="flex:1"> <small style="color:var(--mut)">or drag the scene</small></div><div id="scene"><div id="cap">Illustrative campus model · drag = rotate/pan · scroll or slider = zoom</div><div id="bld"></div></div></div></div>
+<div class="card" id="det" hidden></div>
+<p class="s">Notes: lunch (P5) counts as free; timetable clashes count as occupied; Chemistry Lab has no floor in the source, so it sits in an annex. Outside 9:00–5:00 and on weekends every room is free.</p>
+</main>
+<script>
+const S=[540,590,650,700,750,800,850,910,960],E=[590,640,700,750,800,850,900,960,1010],DN=["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
+const RAW=[["IST 20",0,0,"........./XXXX.XXXX/XXXX...../........./.....XXXX"],["IST 21",0,0,"........./XXXX.XXXX/XXXX...../........./.....XXXX"],
+["IST 107",1,1,"..XX.XXXX/XX...XX../........./.....XXXX/.......XX"],["IST 108",1,1,"XX......./XX...XX../.X.....XX/XXXX...../X....XXXX"],["TB-106",1,1,"........./.....XXXX/.....XX../..XX...../X........"],
+["IST 201",2,1,"........./..XX...../........./XX.....XX/........."],["IST 211",2,1,".....XXXX/.....XXXX/.....XXXX/.....XXXX/.....XXXX"],["IST 225",2,1,"X.XX...../XXXX...../X.XX...../XXXX...../XXXX....."],["IST 227",2,1,"XXXX...../XXXX...../XXXX...../XX.X...../XXX......"],
+["IST 309",3,1,"XXXX.XXXX/XX......./.......XX/XX...XXXX/.....XX.."],
+["IST 401",4,1,"........./........./X......../XX......./........."],["IST 411",4,1,".....XXXX/.....XXXX/.....XXXX/.....XXXX/.....XXXX"],["IST 416",4,1,"XXXX...../XXXX...../XXXX...../XXXX...../XXXX....."],
+["IST 502",5,1,".....XXXX/.....XXXX/......XXX/...X.XXXX/........."],["IST 510",5,1,"........./........./XXXX...../.X.X.XX../........."],["IST 518",5,1,"XXXX.XXXX/XXXX.XXXX/XXXX.XXXX/XXXX.XXXX/XXXX.XXXX"],["IST 519",5,1,"XXXX...../XXXX...../XXXX...../XXXX...../XXXX....."],["IST 520",5,1,"XX.X...../..X....../X......../...X...../........."],
+["IST 602",6,1,"XXXX.XXXX/XXXX.XXXX/XXX...XXX/XXXX.XXXX/XXXX.X.XX"],["IST 609",6,1,"X......../........./........./........./........."],["IST 617",6,1,"..XX...../........./.X..XX.../........./XX......."],["IST 618",6,1,"........./........./....XXX../........./........."],["IST 625",6,1,"XX...XX../XXX...X../X......XX/........./.....X..."],["IST 626",6,1,"........./........./........./..X....../XXXXXXXXX"],
+["IST 702",7,1,".....XXXX/......XXX/.....XXXX/.....XXXX/XXXXXX..."],["IST 710",7,1,"XX.X...XX/X.XX...../X.X....../X.XX...../........."],
+["Chemistry Lab",-1,0,"..XX.XX../XX......./........./XX......./........."]];
+const RM=RAW.map(([id,fl,ac,d])=>({id,fl,ac,iv:d.split("/").map(s=>{const a=[];for(let i=0;i<9;i++)if(s[i]=="X"){const l=a[a.length-1];if(l&&S[i]-l[1]<=10)l[1]=E[i];else a.push([S[i],E[i]])}return a})}));
+const FN=f=>f<0?"Annex (floor not given)":f==0?"Ground floor":f+["st","nd","rd"][f-1]||f+"th"+" floor";
+const fl=f=>f<0?"Annex (floor not given)":f==0?"Ground floor":f+(["st","nd","rd"][f-1]||"th")+" floor";
+const fm=m=>{m=Math.round(m);let h=Math.floor(m/60)%24,n=m%60;return(h%12||12)+":"+String(n).padStart(2,"0")+" "+(h<12?"AM":"PM")};
+const $=i=>document.getElementById(i);
+let live=true,base={d:0,s:0},t0=Date.now(),sel=null;
+function cur(){if(live){const n=new Date();return{d:(n.getDay()+6)%7,s:n.getHours()*3600+n.getMinutes()*60+n.getSeconds()}}return{d:base.d,s:base.s+(Date.now()-t0)/1000}}
+function info(r,d,s){const t=s/60;if(d>4)return{occ:false,until:Infinity,dur:1e9};const v=r.iv[d];
+ for(const[a,b]of v)if(t>=a&&t<b)return{occ:true,until:b,dur:0};
+ for(const[a]of v)if(a>t)return{occ:false,until:a,dur:a-t};return{occ:false,until:Infinity,dur:1e9}}
+const cls=i=>i.occ?"r":i.dur>=60?"g":"y";
+const sub=i=>i.occ?"In class till "+fm(i.until):i.until==Infinity?"Free rest of day":"Free until "+fm(i.until);
+function bcard(r,c,s0){const i=info(r,c.d,s0??c.s),m=i.until==Infinity?"Free all day":Math.floor(i.dur/60)+"h "+Math.round(i.dur%60)+"m free";
+ return `<div class="bc s-${cls(i)}${sel==r.id?" sel":""}" data-id="${r.id}"><div class="l"><b>${r.id}</b><small>${fl(r.fl)}</small><em>${r.ac?"AC":"Non-AC"}</em></div><div class="m"><b>${i.occ?"In class till":"Free until"}</b><span>${i.occ?fm(i.until):i.until==Infinity?"End of day":fm(i.until)}</span></div><div class="r"><span class="st">${i.occ?"Occupied":m}</span><small>80 seats</small><span class="go">${i.occ?"VIEW":"SELECT ›"}</span></div></div>`}
+function tile(r,c){return bcard(r,c)}
+function b3(fls,c){const T=[[-120,-60],[-70,20],[-110,110],[-70,190],[-130,215],[30,232],[240,236],[330,232],[420,228],[545,-40],[555,60],[585,140],[575,215],[150,-70],[300,-80],[420,-70],[-90,-100],[40,385],[200,395],[360,382],[500,390]];
+ let h='<div class="gd"></div><div class="ap"></div><div class="rd"></div><div class="pa"></div><div class="sg">ACADEMIC BLOCK · MAIN ENTRANCE</div>'+T.map(([x,y])=>`<div class="tree" style="left:${x}px;top:${y}px"><div class="sh"></div><div class="tp"></div><div class="tp b"></div></div>`).join("");
+ fls.forEach((f,k)=>{h+=`<div class="slab${OF===f?" op":""}" data-f="${f}" style="transform:translateZ(${k*96+(OF!==null&&k>fls.indexOf(OF)?280:0)}px)"><div class="fa"></div><div class="co"></div><div class="sw"></div><div class="bw"></div><div class="st">Stairs / Lift</div><span class="lb">${f<0?"A":f==0?"G":f}</span>`+RM.filter(r=>r.fl==f).map((r,i)=>{const n=info(r,c.d,c.s),sh=n.occ?"Class till "+fm(n.until):n.until==Infinity?"Free all day":"Free till "+fm(n.until),b=i%2,W='<u class="wi sd"></u>',K='<u class="wi" style="left:64px;top:16px;width:48px;height:22px"></u>',D='<u class="wi" style="left:8px;top:14px;width:36px;height:24px"></u>',ys=b?[8,22,36]:[22,36,50],
+  bn=ys.map(y=>[8,66].map(x=>`<i style="left:${x}px;top:${y}px"><b></b></i>`).join("")).join("")+`<i style="left:48px;top:${b?54:6}px;width:24px"><b></b></i>`;
+  return `<div class="rm ${r.ac?"ac":"nac"}${n.occ?" occ":""}${sel==r.id?" sel":""}" data-id="${r.id}" style="--c:var(--${cls(n)});left:${8+(i>>1)*140}px;top:${b?106:8}px"><div class="fo"></div><div class="wb ${b?"wd":"wk"}">${b?D:K}</div><div class="wf ${b?"wk":"wd"}">${b?K:D}</div><div class="wl">${W}</div><div class="wr"></div>${bn}<div class="lbl"><b style="font-size:${r.id.length>8?14:22}px">${r.id}</b>${sh}<em>${r.ac?"AC":"Non-AC"} · 80 seats</em></div></div><div class="cl" style="--c:var(--${cls(n)});left:${8+(i>>1)*140+(b?62:2)}px;top:79px">${r.id.replace("Chemistry Lab","Chem Lab")}</div>`}).join("")+`</div>`});
+ return h+`<div class="slab" style="transform:translateZ(${fls.length*96+(OF!==null?280:0)}px)"><div class="fa" style="background:#b8bcc4;border:5px solid #8e95a1"></div><div class="tk" style="left:50px;top:60px"></div><div class="tk" style="left:130px;top:80px"></div><div class="rs">IST</div></div>`}
+function fit(){const w=$("scene").clientWidth;if(!w)return;const k=Math.min(1,w/640);SC=k;$("bld").style.setProperty("--s",k);$("scene").style.height=Math.round(860*k+40)+"px"}
+addEventListener("resize",fit);
+let OF=null,SC=1;
+const F3=()=>{const a=[...new Set(RM.map(r=>r.fl))].sort((x,y)=>x-y);return[...a.filter(f=>f>=0),...a.filter(f=>f<0)]};
+function fsum(){const e=$("fi");if(!e)return;if(OF===null){e.textContent="Tap a floor (or a button above) to pull it apart from the rest of the building.";return}
+ const c=cur(),rs=RM.filter(r=>r.fl==OF),fr=rs.filter(r=>!info(r,c.d,c.s).occ).length;e.textContent=fl(OF)+": "+fr+" free · "+(rs.length-fr)+" in class — tap the floor again or \"All floors\" to close."}
+function openFloor(f){OF=(f===null||OF===f)?null:f;
+ document.querySelectorAll("#fb button").forEach(b=>b.className=b.dataset.f==(OF===null?"all":OF)?"on":"");
+ const z=OF===null?1:1.5,H=$("scene").clientHeight,k=OF===null?0:F3().indexOf(OF),rx=$("til").value*Math.PI/180;
+ ty=OF===null?0:-0.42*H+k*96*Math.sin(rx)*SC*z;
+ $("zm").value=z*100;$("bld").style.setProperty("--z",z);$("bld").style.setProperty("--ty",ty+"px");render()}
+function buildFb(){$("fb").innerHTML='<button data-f="all" class="on">All floors</button>'+F3().map(f=>`<button data-f="${f}">${f<0?"Annex":f==0?"Ground":"Floor "+f}</button>`).join("");
+ document.querySelectorAll("#fb button").forEach(b=>b.onclick=()=>openFloor(b.dataset.f=="all"?null:+b.dataset.f))}
+function render(){const c=cur();$("clk").textContent=DN[c.d]+" "+fm(c.s/60)+(live?" (live)":"");
+ const fls=F3();
+ $("grid").innerHTML=fls.map(f=>`<div class="card fl"><h3>${fl(f)}</h3><div class="tiles">${RM.filter(r=>r.fl==f).map(r=>tile(r,c)).join("")}</div></div>`).join("");
+ $("bld").innerHTML=b3(fls,c);fsum();
+ det()}
+function det(){const b=$("det");if(!sel){b.hidden=true;return}const r=RM.find(x=>x.id==sel),c=cur(),i=info(r,c.d,c.s);b.hidden=false;
+ const left=i.until==Infinity?null:Math.max(0,i.until*60-c.s),h=Math.floor(left/3600),m=Math.floor(left%3600/60),s=Math.floor(left%60);
+ const cd=left==null?"No more classes today":[h,m,s].map(x=>String(x).padStart(2,"0")).join(":");
+ const msg=`📍 Heading to ${r.id}. It's free until ${i.until==Infinity?"the end of the day":fm(i.until)}. Come fast!`;
+ b.innerHTML=`<div class="row"><b style="font-size:18px">${r.id}</b><span>${fl(r.fl)} · ${r.ac?"AC":"Non-AC"} · seats 80</span><button style="margin-left:auto" onclick="sel=null;render()">✕</button></div>
+ <div>${i.occ?"Class in progress — free again at "+fm(i.until)+" (countdown to end)":"Free — next class starts in"}</div><div id="cd">${cd}</div>
+ ${i.occ?"":`<p style="margin:8px 0"><a class="wa" target="_blank" rel="noopener" href="https://wa.me/?text=${encodeURIComponent(msg)}">📣 Call the squad on WhatsApp</a></p>`}`}
+function tick(){if(sel)det()}
+document.addEventListener("click",e=>{const t=e.target.closest(".t,.rm,.bc");if(t){sel=t.dataset.id;render();return}const sl=e.target.closest(".slab[data-f]");if(sl)openFloor(+sl.dataset.f)});
+$("day").innerHTML=DN.map((n,i)=>`<option value="${i}">${n}</option>`).join("");
+function setT(){live=false;const[h,m]=($("tm").value||"09:00").split(":");base={d:+$("day").value,s:h*3600+m*60};t0=Date.now();render()}
+$("day").onchange=$("tm").onchange=setT;
+$("now").onclick=()=>{live=true;sync();render()};
+function sync(){const c=cur();$("day").value=c.d;const m=Math.floor(c.s/60);$("tm").value=String(Math.floor(m/60)).padStart(2,"0")+":"+String(m%60).padStart(2,"0")}
+$("v1").onclick=()=>{$("grid").hidden=false;$("map").hidden=true;$("v1").className="on";$("v2").className=""};
+$("v2").onclick=()=>{$("grid").hidden=true;$("map").hidden=false;$("v2").className="on";$("v1").className="";fit()};
+$("rot").oninput=e=>$("bld").style.setProperty("--rz",e.target.value+"deg");
+$("zm").oninput=e=>$("bld").style.setProperty("--z",e.target.value/100);
+$("til").oninput=e=>$("bld").style.setProperty("--rx",e.target.value+"deg");
+let dx=null,dy=0,ty=0;$("scene").onpointerdown=e=>{dx=e.clientX;dy=e.clientY};window.onpointerup=()=>dx=null;$("scene").onpointermove=e=>{if(dx!==null){const v=Math.max(-180,Math.min(180,+$("rot").value+(e.clientX-dx)/3));$("rot").value=v;$("bld").style.setProperty("--rz",v+"deg");ty+=e.clientY-dy;$("bld").style.setProperty("--ty",ty+"px");dx=e.clientX;dy=e.clientY}};
+$("scene").addEventListener("wheel",e=>{e.preventDefault();const v=Math.max(60,Math.min(300,+$("zm").value*(e.deltaY<0?1.1:.91)));$("zm").value=v;$("bld").style.setProperty("--z",v/100)},{passive:false});
+// Natural-language parser (rule-based, runs offline)
+function parse(q){q=q.toLowerCase();const p={floor:null,ac:null,dur:60,start:null};
+ if(/ground|\bgf\b/.test(q))p.floor=0;else{const m=q.match(/(\d)\s*(?:st|nd|rd|th)?\s*floor|floor\s*(\d)/);if(m)p.floor=+(m[1]||m[2])}
+ if(/non[- ]?ac|without ac|no ac/.test(q))p.ac=false;else if(/\bac\b|a\/c|air.?con/.test(q))p.ac=true;
+ let m;if(m=q.match(/(\d+(?:\.\d+)?)\s*(?:hours?|hrs?|h)\b/))p.dur=m[1]*60;else if(m=q.match(/(\d+)\s*min/))p.dur=+m[1];else if(/half an hour|half hour/.test(q))p.dur=30;
+ if(m=q.match(/(?:at|from|after)\s*(\d{1,2})(?::(\d\d))?\s*(am|pm)?/)){let h=+m[1];const ap=m[3];if(ap=="pm"&&h<12)h+=12;if(ap=="am"&&h==12)h=0;if(!ap&&h<8)h+=12;p.start=h*3600+(+m[2]||0)*60}
+ return p}
+$("go").onclick=()=>{const p=parse($("q").value),c=cur(),s=p.start??c.s;
+ const sc=(r,strict)=>{const i=info(r,c.d,s);if(i.occ||i.dur<p.dur)return null;if(p.ac!==null&&!!r.ac!=p.ac)return null;if(strict&&p.floor!==null&&r.fl!=p.floor)return null;return{r,i,k:(p.floor!==null?Math.abs(r.fl-p.floor)*1000:0)-Math.min(i.dur,600)}};
+ let res=RM.map(r=>sc(r,true)).filter(Boolean),relaxed=false;
+ if(!res.length){res=RM.map(r=>sc(r,false)).filter(Boolean);relaxed=true}
+ res.sort((a,b)=>a.k-b.k);res=res.slice(0,6);
+ const desc=`${p.ac===null?"any":p.ac?"AC":"non-AC"} room, ${p.floor===null?"any floor":fl(p.floor)}, ${p.dur>=60?p.dur/60+" h":p.dur+" min"} from ${fm(s/60)}`;
+ $("out").innerHTML=`<p class="s" style="margin:8px 0">Understood: ${desc}</p>`+(res.length?(relaxed?`<p><b>No exact match on that floor</b> — nearest alternatives:</p>`:"")+res.map(x=>bcard(x.r,c,s)).join(""):`<p>No room is free that long. Try a shorter window or a later time.</p>`)};
+document.querySelectorAll(".chip").forEach(b=>b.onclick=()=>{$("q").value=($("q").value+" "+b.dataset.t).trim()});
+$("q").onkeydown=e=>{if(e.key=="Enter")$("go").click()};
+buildFb();sync();render();setInterval(tick,1000);setInterval(()=>{if(live)sync();render()},30000);
+</script></body></html>
